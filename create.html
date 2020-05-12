@@ -10,6 +10,40 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<script src="https://rdf.js.org/comunica-browser/versions/latest/packages/actor-init-sparql/comunica-browser.js"></script>
+		<script language="JavaScript">
+			function saveRecipe(sp) {
+				var engine = Comunica.newEngine();
+				engine.query(sp ,   { sources: [ 
+						{ type: 'file', value: 'https://flow.recipes/ns/core' },
+						{ type: 'file', value: 'https://flow.recipes/ns/schemes' }
+					] }).then(function (result){
+					result.quadStream.on('data', (data) => console.log(data));
+					
+					/*engine.resultToString(result, 'text/n3').then((d) => {
+						console.log(d)
+			    		res = ''
+					   // d.data.on('data', (a) => { res += a })
+					   // d.data.on('end', () => { console.log(res) })
+		    		});*/
+			    });
+			}
+			
+			function loadsparqlFile(file, callback) {
+				var f = new XMLHttpRequest();
+			    f.open("GET", file, true);
+    			f.onreadystatechange = function () {
+	        		if(f.readyState === 4) {
+			            if(f.status === 200 || f.status == 0) {
+			                var res= f.responseText;
+			                callback(res);
+			            }
+	    			 }
+    			}
+				f.send(null);
+			}
+			loadsparqlFile("assets/sp/createRecipe.sp", saveRecipe)
+		</script>
 	</head>
 	<body>
 
