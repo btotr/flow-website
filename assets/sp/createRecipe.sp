@@ -4,7 +4,7 @@ PREFIX fs: <https://flow.recipes/ns/schemes#>
 CONSTRUCT {
 #  recipe	
 	?recipeInstance a core:Recipe ;
-				 a owl:NamedIndividual  ;
+				 a owl:NamedIndividual ;
 				core:instructions _:list ; 
 				rdfs:label ?recipeName ;
 	.

@@ -11,22 +11,48 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<script src="https://rdf.js.org/comunica-browser/versions/latest/packages/actor-init-sparql/comunica-browser.js"></script>
+		<!--script src="assets/js/bundle.js"></script-->
 		<script language="JavaScript">
 			function saveRecipe(sp) {
+				
+				
+				
 				var engine = Comunica.newEngine();
 				engine.query(sp ,   { sources: [ 
 						{ type: 'file', value: 'https://flow.recipes/ns/core' },
 						{ type: 'file', value: 'https://flow.recipes/ns/schemes' }
 					] }).then(function (result){
-					result.quadStream.on('data', (data) => console.log(data));
-					
-					/*engine.resultToString(result, 'text/n3').then((d) => {
-						console.log(d)
-			    		res = ''
-					   // d.data.on('data', (a) => { res += a })
-					   // d.data.on('end', () => { console.log(res) })
-		    		});*/
+    					engine.resultToString(result, 'application/trig', result.context).then((d) => {
+						var res = '';
+    					d.data.on('data', (a) => { res += a })
+    					d.data.on('end', () => { 
+    						console.log(res) 
+    						console.log(res) 
+    						trig2RDFXML(res, addFlowVisualisation)
+    					})
+    				})
 			    });
+			}
+			
+			function addFlowVisualisation(){
+				console.log("TODO")
+			}
+			
+			
+			function trig2RDFXML(trig, callback){
+				var f = new XMLHttpRequest();
+			    f.open("POST", 'https://jebsye0qkk.execute-api.eu-west-1.amazonaws.com/default/trig2rdfxml', true);
+    			f.onreadystatechange = function () {
+	        		if(f.readyState === 4) {
+			            if(f.status === 200 || f.status == 0) {
+			                var res= f.responseText;
+			                console.log(res)
+			               callback(res);
+			            }
+	    			 }
+    			}
+				f.send('content='+encodeURIComponent(trig));
+				
 			}
 			
 			function loadsparqlFile(file, callback) {
@@ -36,6 +62,7 @@
 	        		if(f.readyState === 4) {
 			            if(f.status === 200 || f.status == 0) {
 			                var res= f.responseText;
+			                console.log(res)
 			                callback(res);
 			            }
 	    			 }
@@ -82,12 +109,6 @@
 					</ul>
 				</div>
 			</footer>
-
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
 
 	</body>
 </html>
