@@ -11,12 +11,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<script src="https://rdf.js.org/comunica-browser/versions/latest/packages/actor-init-sparql/comunica-browser.js"></script>
-		<!--script src="assets/js/bundle.js"></script-->
 		<script language="JavaScript">
-			function saveRecipe(sp) {
-				
-				
-				
+		
+		
+			function querySparql(sp) {
+				console.log("query sparql")
 				var engine = Comunica.newEngine();
 				engine.query(sp ,   { sources: [ 
 						{ type: 'file', value: 'https://flow.recipes/ns/core' },
@@ -27,26 +26,37 @@
     					d.data.on('data', (a) => { res += a })
     					d.data.on('end', () => { 
     						console.log(res) 
-    						console.log(res) 
     						trig2RDFXML(res, addFlowVisualisation)
     					})
     				})
 			    });
 			}
 			
-			function addFlowVisualisation(){
-				console.log("TODO")
+			function addFlowVisualisation(recipe){
+				console.log("add flow visualisation");
+				createDownload(recipe.replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?>'));
 			}
 			
+			function createDownload(visualRecipe){
+				var blob = new Blob([visualRecipe], {
+    				type: 'text/xml'
+				});
+				const link = document.createElement('a');
+				link.href = URL.createObjectURL(blob);
+				link.innerText = 'download the recipe';
+				document.body.appendChild(link);
+				
+			}
 			
 			function trig2RDFXML(trig, callback){
+				console.log("trig2RDFXML")
 				var f = new XMLHttpRequest();
 			    f.open("POST", 'https://jebsye0qkk.execute-api.eu-west-1.amazonaws.com/default/trig2rdfxml', true);
     			f.onreadystatechange = function () {
 	        		if(f.readyState === 4) {
 			            if(f.status === 200 || f.status == 0) {
-			                var res= f.responseText;
-			                console.log(res)
+			               var res = f.responseText;
+			               console.log(res);
 			               callback(res);
 			            }
 	    			 }
@@ -56,6 +66,7 @@
 			}
 			
 			function loadsparqlFile(file, callback) {
+				console.log("load sparql")
 				var f = new XMLHttpRequest();
 			    f.open("GET", file, true);
     			f.onreadystatechange = function () {
@@ -69,7 +80,7 @@
     			}
 				f.send(null);
 			}
-			loadsparqlFile("assets/sp/createRecipe.sp", saveRecipe)
+			loadsparqlFile("assets/sp/createRecipe.sp", querySparql)
 		</script>
 	</head>
 	<body>
