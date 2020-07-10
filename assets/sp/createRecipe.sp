@@ -27,7 +27,7 @@ CONSTRUCT {
 	?ingredientConceptInstance skos:prefLabel ?ingredient .
 }
 WHERE {
-	BIND("Risotto" AS ?recipeName) .
+	BIND("${recipeName}" AS ?recipeName) .
 	VALUES (?method ?weight ?ingredient ?addition ?dep)  {
 		("fijnsnijden"  20 "ui" "1" UNDEF)
 		("fruiten"  400 "risottorijst" UNDEF "fijnsnijden")
