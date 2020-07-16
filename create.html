@@ -89,7 +89,7 @@
 				for (var i=0; i< instructionElements.length;i++) {
 					let instruction = instructionElements[i];
 					let dep = undefined;
-					if (i>0) dep = instructionElements[i-1].getElementsByClassName("method")[0].value;
+					if (i>0) dep = '"' + instructionElements[i-1].getElementsByClassName("method")[0].value + '"';
 					let ingredients = [];
 					let ingredientElements = instruction.getElementsByClassName("ingredientDiv");
 					console.log(ingredientElements)
