@@ -23,17 +23,7 @@ function addFlowVisualisation(recipe){
 	createDownload(recipe.replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?>'));
 }
 
-function createDownload(visualRecipe){
-	console.log("create download link");
-	var blob = new Blob([visualRecipe], {
-		type: 'text/xml'
-	});
-	const link = document.createElement('a');
-	link.href = URL.createObjectURL(blob);
-	link.innerText = 'enjoy your recipe';
-	document.body.appendChild(link);
-	
-}
+
 
 function trig2RDFXML(trig, callback){
 	console.log("trig2RDFXML");
@@ -96,7 +86,7 @@ function loadsparqlFile(file, recipeName, instructions) {
 			WHERE {
 				BIND("${recipeName}" AS ?recipeName) .
 				VALUES (?method ?weight ?ingredient ?addition ?dep)  {
-					 ${instructions.map(instruction => `("${instruction.method}" 20 "${instruction.ingredient}" "1" "test")`).join('\n')}
+					 ${instructions.map(instruction => `("${instruction.method}" ${instruction.weight} ${instruction.ingredient} UNDEF ${instruction.dependency})`).join('\n')}
 				}
 			# don't modify the following lines
 				OPTIONAL {
