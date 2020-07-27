@@ -12,117 +12,12 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<script src="https://rdf.js.org/comunica-browser/versions/latest/packages/actor-init-sparql/comunica-browser.js"></script>
 		<script src="assets/js/model.js"></script>
+		<script src="assets/js/view.js"></script>
+		<script src="assets/js/controller.js"></script>
 		<script language="JavaScript">
-		
-		function addInput(labelText){
-			
-			var inputDiv = document.createElement("div");
-			
-			var label = document.createElement("label"); 
-			label.appendChild(document.createTextNode(labelText));
-			var forAttributeMethode = document.createAttribute("for");
-			forAttributeMethode.value = labelText;
-			label.setAttributeNode(forAttributeMethode);
-			inputDiv.appendChild(label);  
-			var input = document.createElement("input"); 
-			var typeAttributeMethode = document.createAttribute("type");
-			typeAttributeMethode.value = "text";
-			input.setAttributeNode(typeAttributeMethode);
-			var idAttributeMethode = document.createAttribute("id");
-			idAttributeMethode.value = labelText+Math.floor(Math.random()*1000);
-			input.setAttributeNode(idAttributeMethode);
-			input.setAttribute("class", labelText);
-			inputDiv.appendChild(input);  
-			return inputDiv;
-		}
-		
-		function addIngredient(createLink){
-			var ingredientDiv = document.createElement("div");
-			ingredientDiv.setAttribute("class", "ingredientDiv");
-			ingredientDiv.appendChild(addInput("ingredient")); 
-			ingredientDiv.appendChild(addInput("weight")); 
-			if(createLink){
-			var addIngredientA = document.createElement("a");
-			addIngredientA.appendChild(document.createTextNode("add ingredient"));
-			ingredientDiv.appendChild(addIngredientA)
-			addIngredientA.addEventListener("click", function(e){
-				e.path[2].appendChild(addIngredient(false)); 
-			});
-			}
-			
-			return ingredientDiv
-		}
-		
-		
-		function addInstruction(){
-			var instruction = document.createElement("div"); 
-			instruction.setAttribute("class", "instruction");
-			instruction.appendChild(addInput("method"));  
-			instruction.appendChild(addIngredient(true));  
-			var addInstructionA = document.createElement("a");
-			addInstructionA.appendChild(document.createTextNode("add instruction"));
-			
-			addInstructionA.addEventListener("click", addInstruction);
-			var form = document.getElementsByTagName("form")[0]; 
-			form.appendChild(addInstructionA)
-			form.insertBefore(instruction, document.getElementById("create"))
-			
-		}
-		
-		function createDownload(visualRecipe){
-			console.log("create download link");
-			var blob = new Blob([visualRecipe], {
-				type: 'text/xml'
-			});
-			const link = document.createElement('a');
-			link.href = URL.createObjectURL(blob);
-			link.innerText = 'enjoy your recipe';
-			document.getElementsByTagName("output")[0].appendChild(link);
-			
-		}
-
-		window.addEventListener("load", function(){
-			addInstruction();
-			document.getElementById("create").addEventListener("click", function(){
-				var instructionElements = document.getElementsByClassName("instruction");
-				var instructions = [];
-				for (var i=0; i< instructionElements.length;i++) {
-					let instruction = instructionElements[i];
-					let dep = undefined;
-					if (i>0) dep = '"' + instructionElements[i-1].getElementsByClassName("method")[0].value + '"';
-					let ingredients = [];
-					let ingredientElements = instruction.getElementsByClassName("ingredientDiv");
-					console.log(ingredientElements)
-					
-					for (var j=0; j< ingredientElements.length;j++) {
-						let ingredient = ingredientElements[j];
-						
-						let weight = ingredient.getElementsByClassName("weight")[0].value  
-						if (weight) weight = '"' + weight + '"';
-
-						let ingredientV = ingredient.getElementsByClassName("ingredient")[0].value  
-						if (ingredientV) ingredientV = '"' + ingredientV + '"';
-						
-						instructions.push(
-						 	{	method: instruction.getElementsByClassName("method")[0].value , 
-						 		ingredient: ingredientV || "UNDEF", 
-						 		weight: weight || "UNDEF",
-						 		dependency: dep || "UNDEF"
-						 	});
-					}
-					
-					
-					
-
-				};
-				console.log(instructions)
-				loadsparqlFile("assets/sp/createRecipe.sp", "risotto", instructions)
-			})
-		});
-		
-		
-
-		
+		   	window.addEventListener("load", function(){
+        		new Controller();
+        	});
 		</script>
 	</head>
 	<body>
@@ -148,8 +43,10 @@
 					<header class="major special">
 						<h2>create </h2>
 				
-						<form action="#">
-							<output></output>
+						<form action="">
+							<output><a></a></output>
+							<label for="name">recipe name</label><input type="text" required id="name"></input>
+							<a href="#" id="add">add instruction</a><br />
 							<button id="create">create</button>
 							
 						</form>

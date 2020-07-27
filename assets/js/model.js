@@ -1,8 +1,12 @@
-/*global Comunica, Blob, URL */
+/*global Comunica */
 
-function querySparql(sp) {
+var Model = function() {
+}
+
+Model.prototype.querySparql = function(sp, callback){
 	console.log("query sparql");
 	var engine = Comunica.newEngine();
+	var self = this;
 	engine.query(sp ,   { sources: [ 
 			{ type: 'file', value: 'https://flow.recipes/ns/core' },
 			{ type: 'file', value: 'https://flow.recipes/ns/schemes' }
@@ -12,20 +16,13 @@ function querySparql(sp) {
 			d.data.on('data', (a) => { res += a });
 			d.data.on('end', () => { 
 				console.log(res) ;
-				trig2RDFXML(res, addFlowVisualisation);
+				self.trig2RDFXML(res, callback);
 			});
 		});
     });
 }
 
-function addFlowVisualisation(recipe){
-	console.log("add flow visualisation");
-	createDownload(recipe.replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?>'));
-}
-
-
-
-function trig2RDFXML(trig, callback){
+Model.prototype.trig2RDFXML = function(trig, callback){
 	console.log("trig2RDFXML");
 	var f = new XMLHttpRequest();
     f.open("POST", 'https://jebsye0qkk.execute-api.eu-west-1.amazonaws.com/default/trig2rdfxml', true);
@@ -41,7 +38,11 @@ function trig2RDFXML(trig, callback){
 	f.send('content='+encodeURIComponent(trig));
 }
 
- function format(literals, ...substitutions) {
+
+
+Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
+	
+	 function format(literals, ...substitutions) {
 	    let result = '';
 	
 	    for (let i = 0; i < substitutions.length; i++) {
@@ -51,9 +52,8 @@ function trig2RDFXML(trig, callback){
 	    // add the last literal
 	    result += literals[literals.length - 1];
 	    return result;
-}
-
-function loadsparqlFile(file, recipeName, instructions) {
+	}
+	
    	let query = format`
 			PREFIX core: <https://flow.recipes/ns/core#>
 			PREFIX fs: <https://flow.recipes/ns/schemes#>
@@ -102,5 +102,5 @@ function loadsparqlFile(file, recipeName, instructions) {
 				BIND( IRI(CONCAT(?recipeName,STR(NOW()))) AS ?recipeInstance) .
 			}`;
 	console.log(query);
-    querySparql(query);
+    this.querySparql(query, callback);
 }
