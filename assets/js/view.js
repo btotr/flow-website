@@ -34,12 +34,23 @@ View.prototype.addIngredient = function(createLink){
 	ingredientDiv.appendChild(this.addInput("ingredient")); 
 	ingredientDiv.appendChild(this.addInput("weight")); 
 	if(createLink){
-	var addIngredientA = document.createElement("a");
-	addIngredientA.appendChild(document.createTextNode("add ingredient"));
-	ingredientDiv.appendChild(addIngredientA);
-	addIngredientA.addEventListener("click", function(e){
-		e.path[2].insertBefore(self.addIngredient(false), e.path[1]); 
-	});
+		var addIngredientA = document.createElement("a");
+		addIngredientA.setAttribute("tabindex", 0);
+		addIngredientA.appendChild(document.createTextNode("add ingredient"));
+		ingredientDiv.appendChild(addIngredientA);
+		addIngredientA.addEventListener("click", function(e){
+			var newIngredient = self.addIngredient(false);
+			e.path[2].insertBefore(newIngredient, e.path[1]); 
+			newIngredient.getElementsByTagName("input")[0].focus();
+			e.preventDefault();
+		});
+		addIngredientA.addEventListener("keydown", function(e){
+			if (e.which === 13) {
+				var newIngredient = self.addIngredient(false);
+				e.path[2].insertBefore(newIngredient, e.path[1]); 
+				newIngredient.getElementsByTagName("input")[0].focus();
+			}
+		});
 	}
 	return ingredientDiv;
 };
@@ -53,6 +64,7 @@ View.prototype.addInstruction = function(){
 	instruction.appendChild(this.addIngredient(true));  
 	var form = document.getElementsByTagName("form")[0]; 
 	form.insertBefore(instruction, document.getElementById("add"));
+	instruction.getElementsByTagName("input")[0].focus();
 };
 		
 View.prototype.createDownload = function(visualRecipe){

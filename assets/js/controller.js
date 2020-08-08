@@ -5,12 +5,20 @@ function Controller() {
     this.model = new Model();
     this.view = new View();
 	this.view.addInstruction();
-	document.getElementById("add").addEventListener("click", function(){
+	document.getElementById("add").addEventListener("click", function(e){
 	    self.view.addInstruction();
+	    e.preventDefault();
 	});
-	document.getElementById("create").addEventListener("click", function(){
+	document.getElementById("add").addEventListener('keydown', function(e){
+	  	if (e.which === 13) self.view.addInstruction();
+	});
+	document.getElementById("create").addEventListener("click", function(e){
 	    self.create();
+	    e.preventDefault();
 	    return false;
+	});
+	document.getElementById("create").addEventListener("keydown", function(e){
+	    if (e.which === 13) self.create();
 	});
 }
 
