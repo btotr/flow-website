@@ -14,6 +14,8 @@ function Controller() {
 	});
 }
 
+
+
 Controller.prototype.create = function(){
 	var instructionElements = document.getElementsByClassName("instruction");
 	var instructions = [];
@@ -28,14 +30,26 @@ Controller.prototype.create = function(){
 			let weight = ingredient.getElementsByClassName("weight")[0].value ;
 			if (weight) weight = '"' + weight + '"';
 
-			let ingredientV = ingredient.getElementsByClassName("ingredient")[0].value ;
+			let ingredientV = ingredient.getElementsByClassName("ingredient")[0].value.split(/ \| /)[0] ;
 			if (ingredientV) ingredientV = '"' + ingredientV + '"';
 			
+			let time = instruction.getElementsByClassName("time")[0].value ;
+			if (time) time = '"' + time + '"';
+			
+			let direction = instruction.getElementsByClassName("method")[0].value.split(/ \| /)[1] ;
+			if (direction) direction = '"' + direction + '"';
+			
+			let addition =instruction.getElementsByClassName("ingredient")[0].value.split(/ \| /)[1] ;
+			if (addition) addition = '"' + addition + '"';
+			
 			instructions.push(
-			 	{	method: instruction.getElementsByClassName("method")[0].value , 
+			 	{	method: instruction.getElementsByClassName("method")[0].value.split(/ \| /)[0] , 
 			 		ingredient: ingredientV || "UNDEF", 
 			 		weight: weight || "UNDEF",
-			 		dependency: dep || "UNDEF"
+			 		dependency: dep || "UNDEF",
+			 		direction: direction || "UNDEF",
+			 		addition: addition || "UNDEF",
+			 		time: time || "UNDEF"
 			 	});
 		}
 	}

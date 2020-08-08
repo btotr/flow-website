@@ -3,7 +3,7 @@
 var View = function() {
 };
 
-View.prototype.addInput = function(labelText){
+View.prototype.addInput = function(labelText, required){
 	var inputDiv = document.createElement("div");
 	var label = document.createElement("label"); 
 	label.appendChild(document.createTextNode(labelText));
@@ -15,8 +15,10 @@ View.prototype.addInput = function(labelText){
 	var typeAttributeMethode = document.createAttribute("type");
 	typeAttributeMethode.value = "text";
 	input.setAttributeNode(typeAttributeMethode);
-	var requiredAttributeMethode = document.createAttribute("required");
-	input.setAttributeNode(requiredAttributeMethode); 
+	if(required){
+		var requiredAttributeMethode = document.createAttribute("required");
+		input.setAttributeNode(requiredAttributeMethode); 
+	}
 	var idAttributeMethode = document.createAttribute("id");
 	idAttributeMethode.value = labelText+Math.floor(Math.random()*1000);
 	input.setAttributeNode(idAttributeMethode);
@@ -36,7 +38,7 @@ View.prototype.addIngredient = function(createLink){
 	addIngredientA.appendChild(document.createTextNode("add ingredient"));
 	ingredientDiv.appendChild(addIngredientA);
 	addIngredientA.addEventListener("click", function(e){
-		e.path[2].appendChild(self.addIngredient(false)); 
+		e.path[2].insertBefore(self.addIngredient(false), e.path[1]); 
 	});
 	}
 	return ingredientDiv;
@@ -46,7 +48,8 @@ View.prototype.addInstruction = function(){
 	var instruction = document.createElement("div"); 
 	var self = this;
 	instruction.setAttribute("class", "instruction");
-	instruction.appendChild(this.addInput("method"));  
+	instruction.appendChild(this.addInput("method", true));  
+	instruction.appendChild(this.addInput("time"));  
 	instruction.appendChild(this.addIngredient(true));  
 	var form = document.getElementsByTagName("form")[0]; 
 	form.insertBefore(instruction, document.getElementById("add"));
