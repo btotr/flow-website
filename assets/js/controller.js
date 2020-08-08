@@ -41,7 +41,7 @@ Controller.prototype.create = function(){
 	}
 	console.log(instructions) ;
 	var self = this;
-	this.model.loadsparqlFile(document.getElementById("name"), instructions, function(recipe){
+	this.model.loadsparqlFile(document.getElementById("name").value, instructions, function(recipe){
 	    console.log("add flow visualisation");
 	    self.view.createDownload(recipe.replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?>'));
 	 });
