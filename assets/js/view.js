@@ -40,9 +40,7 @@ View.prototype.addIngredient = function(createLink){
 		ingredientDiv.appendChild(addIngredientA);
 		addIngredientA.addEventListener("click", function(e){
 			var newIngredient = self.addIngredient(false);
-				console.log(e.srcElement.parentElement)
 			e.srcElement.parentElement.insertBefore(newIngredient, e.srcElement); 
-						
 			newIngredient.getElementsByTagName("input")[0].focus();
 			e.preventDefault();
 		});
