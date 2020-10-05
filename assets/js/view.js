@@ -40,14 +40,16 @@ View.prototype.addIngredient = function(createLink){
 		ingredientDiv.appendChild(addIngredientA);
 		addIngredientA.addEventListener("click", function(e){
 			var newIngredient = self.addIngredient(false);
-			e.path[2].insertBefore(newIngredient, e.path[1]); 
+				console.log(e.srcElement.parentElement)
+			e.srcElement.parentElement.insertBefore(newIngredient, e.srcElement); 
+						
 			newIngredient.getElementsByTagName("input")[0].focus();
 			e.preventDefault();
 		});
 		addIngredientA.addEventListener("keydown", function(e){
 			if (e.which === 13) {
 				var newIngredient = self.addIngredient(false);
-				e.path[2].insertBefore(newIngredient, e.path[1]); 
+				e.srcElement.parentElement.insertBefore(newIngredient, e.srcElement); 
 				newIngredient.getElementsByTagName("input")[0].focus();
 			}
 		});
