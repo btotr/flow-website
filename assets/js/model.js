@@ -25,7 +25,7 @@ Model.prototype.querySparql = function(sp, callback){
 Model.prototype.trig2RDFXML = function(trig, callback){
 	console.log("trig2RDFXML");
 	var f = new XMLHttpRequest();
-    f.open("POST", 'https://x8nbg8tb0m.execute-api.eu-west-1.amazonaws.com/dev/trig2xml', true);
+    f.open("POST", 'https://jebsye0qkk.execute-api.eu-west-1.amazonaws.com/default/trig2rdfxml', true);
 	f.onreadystatechange = function () {
 		if(f.readyState === 4) {
             if(f.status === 200 || f.status == 0) {
