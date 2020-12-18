@@ -16,7 +16,8 @@ Model.prototype.querySparql = function(sp, callback){
 			d.data.on('data', (a) => { res += a });
 			d.data.on('end', () => { 
 				console.log(res) ;
-				self.trig2RDFXML(res, callback);
+				var prefix = "@prefix core:  <https://flow.recipes/ns/core#> .  @prefix skos: <http://www.w3.org/2008/05/skos#> . ";
+				self.trig2RDFXML(prefix + res, callback);
 			});
 		});
     });
