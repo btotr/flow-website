@@ -59,7 +59,7 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 			PREFIX core: <https://flow.recipes/ns/core#>
 			PREFIX fs: <https://flow.recipes/ns/schemes#>
 			CONSTRUCT {
-				?recipeInstance a core:Recipe ;
+							?recipeInstance a core:Recipe ;
 							 a owl:NamedIndividual ;
 							core:instructions _:list ; 
 							rdfs:label ?recipeName ;
@@ -67,15 +67,14 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 				_:list rdfs:member ?instruction .
 				?instruction a core:Instruction ;
 					a owl:NamedIndividual  ;
-					core:hasComponentUnit [
-						core:hasComponent ?ingredientConceptInstance ;
-						core:weight ?weight ;
-						core:componentAddition ?addition ;
-					] ;
+					core:hasComponentUnit ?cu ;
 					core:hasMethod ?methodConceptInstance ;
 					core:time ?time ;
 					core:direction ?direction ;
 					core:depVariationInstruction ?depVariationInstruction .
+				?cu core:hasComponent ?ingredientConceptInstance ;
+					core:weight ?weight ;
+					core:componentAddition ?addition .
 				?methodConceptInstance a skos:Concept .
 				?methodConceptInstance skos:prefLabel ?method .
 				?ingredientConceptInstance a skos:Concept .
@@ -97,6 +96,7 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()), "-", ?method)) AS ?instruction) .
 				BIND(IF(!BOUND(?dep), ?dummy, IRI(CONCAT(REPLACE(STR(?recipeName)," ","-"),STR(NOW()), "-", ?dep))) AS ?depVariationInstruction) .
 				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()))) AS ?recipeInstance) .
+				BIND( IRI(CONCAT(STR(?instruction),STR(NOW()),"-cu")) AS ?cu) .
 			}`;
 	console.log(query);
     this.querySparql(query, callback);
