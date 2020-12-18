@@ -94,8 +94,8 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 					?ingredientConcept skos:prefLabel ?ingredient . 
 				} .
 				BIND(IF(BOUND(?ingredientConcept), ?ingredientConcept, IRI(CONCAT("fs:",STR(NOW()), "-", ?ingredient))) AS ?ingredientConceptInstance) .
-				BIND( IRI(CONCAT(REPLACE(STR(?recipeName," ","-") ,STR(NOW()), "-", ?method)) AS ?instruction) .
-				BIND(IF(!BOUND(?dep), ?dummy, IRI(CONCAT(REPLACE(STR(?recipeName," ","-"),STR(NOW()), "-", ?dep))) AS ?depVariationInstruction) .
+				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()), "-", ?method)) AS ?instruction) .
+				BIND(IF(!BOUND(?dep), ?dummy, IRI(CONCAT(REPLACE(STR(?recipeName)," ","-"),STR(NOW()), "-", ?dep))) AS ?depVariationInstruction) .
 				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()))) AS ?recipeInstance) .
 			}`;
 	console.log(query);
