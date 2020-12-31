@@ -30,15 +30,28 @@ Model.prototype.trig2RDFXML = function(trig, callback){
 	f.onreadystatechange = function () {
 		if(f.readyState === 4) {
             if(f.status === 200 || f.status == 0) {
-               var res = f.responseText;
-               console.log(res);
-               callback(res);
+               var res = f.responseXML;
+                 console.log(res);
+               
+                var xsltProcessor = new XSLTProcessor();
+				xsltProcessor.importStylesheet(loadXSL("assets/xslt/rdf2xml.xslt"));
+				result = xsltProcessor.transformToFragment(res, document);
+	            console.log(result);
+    			callback(result);
+					
+
             }
 		 }
 	};
 	f.send(trig);
 }
 
+function loadXSL(filename){
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", filename, false);
+	xhttp.send("");
+	return xhttp.responseXML;
+}
 
 
 Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
@@ -67,14 +80,15 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 				_:list rdfs:member ?instruction .
 				?instruction a core:Instruction ;
 					a owl:NamedIndividual  ;
-					core:hasComponentUnit ?cu ;
+					core:hasComponentUnit [
+						core:hasComponent ?ingredientConceptInstance ;
+						core:weight ?weight ;
+						core:componentAddition ?addition;
+					];
 					core:hasMethod ?methodConceptInstance ;
 					core:time ?time ;
 					core:direction ?direction ;
 					core:depVariationInstruction ?depVariationInstruction .
-				?cu core:hasComponent ?ingredientConceptInstance ;
-					core:weight ?weight ;
-					core:componentAddition ?addition .
 				?methodConceptInstance a skos:Concept .
 				?methodConceptInstance skos:prefLabel ?method .
 				?ingredientConceptInstance a skos:Concept .
