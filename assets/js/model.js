@@ -1,4 +1,4 @@
-/*global Comunica */
+/*global Comunica xsltProcessor XMLSerializer */
 
 var Model = function() {
 }
@@ -25,37 +25,40 @@ Model.prototype.querySparql = function(sp, callback){
 
 Model.prototype.trig2RDFXML = function(trig, callback){
 	console.log("trig2RDFXML");
+	var self = this;
 	var f = new XMLHttpRequest();
     f.open("POST", 'https://x8nbg8tb0m.execute-api.eu-west-1.amazonaws.com/dev/trig2xml', true);
 	f.onreadystatechange = function () {
 		if(f.readyState === 4) {
             if(f.status === 200 || f.status == 0) {
                var res = f.responseXML;
-                 console.log(res);
-               
-                var xsltProcessor = new XSLTProcessor();
-				xsltProcessor.importStylesheet(loadXSL("assets/xslt/rdf2xml.xslt"));
-				result = xsltProcessor.transformToFragment(res, document);
-	            console.log(result);
-    			callback(result);
-					
-
+                console.log(res);
+				self.fixRDFXML(res, callback);
             }
 		 }
 	};
 	f.send(trig);
 }
 
-function loadXSL(filename){
-	xhttp = new XMLHttpRequest();
-	xhttp.open("GET", filename, false);
-	xhttp.send("");
-	return xhttp.responseXML;
+Model.prototype.fixRDFXML = function(xml, callback){
+	var loadXSL = function (filename){
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("GET", filename, false);
+		xhttp.send("");
+		return xhttp.responseXML;
+	}
+	var xsltProcessor = new XSLTProcessor();
+	xsltProcessor.importStylesheet(loadXSL("assets/xslt/rdf2xml.xslt"));
+	var result = xsltProcessor.transformToFragment(xml, document);
+	console.log(result);
+	var ser = new XMLSerializer();
+	
+	console.log(ser.serializeToString(result));
+	callback(ser.serializeToString(result));
+	
 }
 
-
 Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
-	
 	 function format(literals, ...substitutions) {
 	    let result = '';
 	
