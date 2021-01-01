@@ -19,27 +19,37 @@
 	<!-- Grouping Using the Muenchian Method -->
 
 	<xsl:template match="node()|@*">
-		<xsl:message>identity</xsl:message>
 		<xsl:copy>
 		   <xsl:apply-templates select="node()|@*"/>
 		</xsl:copy>
 	</xsl:template>
 
 	<xsl:key name="dKey" match="//rdf:Description" use="@rdf:about|@rdf:nodeID"/>
-	<xsl:template match="/rdf:Description">
-	 <xsl:for-each select="//rdf:Description[generate-id() = generate-id(key('dKey', @rdf:about|@rdf:nodeID)[1])]">
-	     <xsl:message>copy</xsl:message>
+	<xsl:template match="//rdf:Description[generate-id() = generate-id(key('dKey', @rdf:about|@rdf:nodeID)[1])]">
+			<xsl:message>copy</xsl:message>
 	          <xsl:copy>
                     <xsl:apply-templates select="@*|key('dKey', @rdf:about|@rdf:nodeID)/node()"/>
 	          </xsl:copy>
-		</xsl:for-each>
+	          	<xsl:call-template name="removetype">
+					<xsl:with-param name="description" select="key('dKey', @rdf:about|@rdf:nodeID)" />
+    			</xsl:call-template>
+	</xsl:template>
+	
+	<!-- TODO -->
+	<xsl:template name="removetype">
+		<xsl:param name="description" />
+			<xsl:message>d: <xsl:value-of select="./@rdf:about|@rdf:nodeID" /></xsl:message>
+			<xsl:for-each select="$description/rdf:type">
+				<xsl:message>t: <xsl:value-of select="@rdf:resource" /></xsl:message>
+				 <!--xsl:if test="not(rdf:type[@rdf:resource=current()/@rdf:resource[1]])">
+	          <xsl:copy>
+                    <xsl:apply-templates select="@*"/>
+	          </xsl:copy>
+        		</xsl:if-->  
+			</xsl:for-each>
 	</xsl:template>
 
-	
-	<!--xsl:key name="tKey" match="rdf:type" use="//rdf:Description//@rdf:resource"/>
-	<xsl:template match="rdf:type[not(generate-id(.) = generate-id(key('tKey', @rdf:resource)[1]))]"/-->
 
-	
 	<xsl:key name="cuKey" match="core:hasComponentUnit" use="@rdf:nodeID"/>
 	<xsl:template match="core:hasComponentUnit[not(generate-id(.) = generate-id(key('cuKey', @rdf:nodeID)[1]))]"/>
 

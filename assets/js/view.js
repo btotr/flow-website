@@ -67,14 +67,20 @@ View.prototype.addInstruction = function(){
 	instruction.getElementsByTagName("input")[0].focus();
 };
 		
-View.prototype.createDownload = function(visualRecipe){
+View.prototype.createDownload = function(visualRecipe, type){
 	console.log("create download link");
 	var blob = new Blob([visualRecipe], {
 		type: 'text/xml'
 	});
 	const link = document.createElement('a');
 	link.href = URL.createObjectURL(blob);
-	link.innerText = 'enjoy your recipe';
-	const output = document.getElementsByTagName("output")[0];
+	var output = document.getElementsByTagName("output")[0];
+	if (type == "data")	{
+		link.innerText = 'download data';
+	} else {
+		link.innerText = 'open recipe';
+		output = document.getElementsByTagName("output")[1];
+	}
+	
 	output.replaceChild(link, output.firstElementChild);
 };

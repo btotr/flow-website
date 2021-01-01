@@ -64,7 +64,31 @@ Controller.prototype.create = function(){
 	console.log(instructions) ;
 	var self = this;
 	this.model.loadsparqlFile(document.getElementById("name").value, instructions, function(recipe){
+		
+			var loadXSL = function (filename){
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("GET", filename, false);
+		xhttp.send("");
+		return xhttp.responseXML;
+	}
+	
+	let parser = new DOMParser()
+	let xml = parser.parseFromString(recipe, "application/xml")
+	console.log(xml)
+	
+	var xsltProcessor = new XSLTProcessor();
+	xsltProcessor.importStylesheet(loadXSL("https://flow.recipes/flow-visualizer/flow-visualiser.xsl"));
+	var result = xsltProcessor.transformToFragment(xml, document);
+	console.log(result);
+	var ser = new XMLSerializer();
+	
+	console.log(ser.serializeToString(result));
+	var contentVis = ser.serializeToString(result);
+		
+		
 	    console.log("add flow visualisation");
-	    self.view.createDownload(recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF'));
+	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
+	    self.view.createDownload(content,"data");
+	    self.view.createDownload(contentVis, "vis");
 	 });
 };

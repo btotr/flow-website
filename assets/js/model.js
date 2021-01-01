@@ -40,6 +40,8 @@ Model.prototype.trig2RDFXML = function(trig, callback){
 	f.send(trig);
 }
 
+
+
 Model.prototype.fixRDFXML = function(xml, callback){
 	var loadXSL = function (filename){
 		var xhttp = new XMLHttpRequest();
