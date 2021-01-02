@@ -76,7 +76,7 @@ View.prototype.createDownload = function(visualRecipe, type){
 	link.href = URL.createObjectURL(blob);
 	var output = document.getElementsByTagName("output")[0];
 	if (type == "data")	{
-		link.innerText = 'download data';
+		link.innerText = 'enjoy your recipe!';
 	} else {
 		link.innerText = 'open recipe';
 		output = document.getElementsByTagName("output")[1];

@@ -30,10 +30,12 @@
 	          <xsl:copy>
                     <xsl:apply-templates select="@*|key('dKey', @rdf:about|@rdf:nodeID)/node()"/>
 	          </xsl:copy>
-	          	<xsl:call-template name="removetype">
+	          	<!--xsl:call-template name="removetype">
 					<xsl:with-param name="description" select="key('dKey', @rdf:about|@rdf:nodeID)" />
-    			</xsl:call-template>
+    			</xsl:call-template-->
 	</xsl:template>
+	
+
 	
 	<!-- TODO -->
 	<xsl:template name="removetype">
@@ -48,6 +50,8 @@
         		</xsl:if-->  
 			</xsl:for-each>
 	</xsl:template>
+	
+	<xsl:template match="//rdf:Description[not(generate-id(.) = generate-id(key('dKey', @rdf:about|@rdf:nodeID)[1]))]"/>
 
 
 	<xsl:key name="cuKey" match="core:hasComponentUnit" use="@rdf:nodeID"/>
