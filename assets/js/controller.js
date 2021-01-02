@@ -47,7 +47,7 @@ Controller.prototype.create = function(){
 			let direction = instruction.getElementsByClassName("method")[0].value.split(/ \| /)[1] ;
 			if (direction) direction = '"' + direction + '"';
 			
-			let addition =instruction.getElementsByClassName("ingredient")[0].value.split(/ \| /)[1] ;
+			let addition = ingredient.getElementsByClassName("ingredient")[0].value.split(/ \| /)[1] ;
 			if (addition) addition = '"' + addition + '"';
 			
 			instructions.push(
