@@ -8,15 +8,15 @@ Model.prototype.querySparql = function(sp, callback){
 	var engine = Comunica.newEngine();
 	var self = this;
 	engine.query(sp ,   { sources: [ 
-			{ type: 'file', value: 'https://flow.recipes/ns/core' },
-			{ type: 'file', value: 'https://flow.recipes/ns/schemes' }
+			{ type: 'file', value: 'http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/core' },
+			{ type: 'file', value: 'http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes' }
 		] }).then(function (result){
 			engine.resultToString(result, 'application/trig', result.context).then((d) => {
 			var res = '';
 			d.data.on('data', (a) => { res += a });
 			d.data.on('end', () => { 
 				console.log(res) ;
-				var prefix = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . @prefix core:  <https://flow.recipes/ns/core#> .  @prefix skos: <http://www.w3.org/2008/05/skos#> . ";
+				var prefix = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . @prefix core:  <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/core#> .  @prefix skos: <http://www.w3.org/2008/05/skos#> . ";
 				self.trig2RDFXML(prefix + res, callback);
 			});
 		});
@@ -74,8 +74,8 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 	}
 	
    	let query = format`
-			PREFIX core: <https://flow.recipes/ns/core#>
-			PREFIX fs: <https://flow.recipes/ns/schemes#>
+			PREFIX core: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes.ttl#>
+			PREFIX fs: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes#>
 			CONSTRUCT {
 							?recipeInstance a core:Recipe ;
 							 a owl:NamedIndividual ;
