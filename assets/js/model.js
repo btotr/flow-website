@@ -9,7 +9,7 @@ Model.prototype.querySparql = function(sp, callback){
 	var self = this;
 	engine.query(sp ,   { sources: [ 
 			{ type: 'file', value: 'http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/core' },
-			{ type: 'file', value: 'http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes' }
+			{ type: 'file', value: 'http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schema' }
 		] }).then(function (result){
 			engine.resultToString(result, 'application/trig', result.context).then((d) => {
 			var res = '';
@@ -74,8 +74,8 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 	}
 	
    	let query = format`
-			PREFIX core: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes.ttl#>
-			PREFIX fs: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schemes#>
+			PREFIX core: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/core#>
+			PREFIX fs: <http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/ns/schema#>
 			CONSTRUCT {
 							?recipeInstance a core:Recipe ;
 							 a owl:NamedIndividual ;
