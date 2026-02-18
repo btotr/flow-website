@@ -77,7 +77,7 @@ Controller.prototype.create = function(){
 		console.log(xml)
 		
 		var xsltProcessor = new XSLTProcessor();
-		xsltProcessor.importStylesheet(loadXSL("https://flow.recipes/flow-visualizer/flow-visualiser.xsl"));
+		xsltProcessor.importStylesheet(loadXSL("http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"));
 		var result = xsltProcessor.transformToFragment(xml, document);
 		console.log(result);
 		var ser = new XMLSerializer();
@@ -87,7 +87,7 @@ Controller.prototype.create = function(){
 		
 		
 	    console.log("add flow visualisation");
-	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://flow.recipes/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
+	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
 	    self.view.createDownload(content,"data");
 	    //self.view.createDownload(contentVis, "vis");
 	 });
