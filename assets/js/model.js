@@ -23,35 +23,111 @@ Model.prototype.querySparql = function(sp, callback){
     });
 }
 
-Model.prototype.trig2RDFXML = function(trig, callback){
+Model.prototype.trig2RDFXML = async function(trigString, callback){
 	console.log("trig2RDFXML");
 	var self = this;
-	var f = new XMLHttpRequest();
-    f.open("POST", 'https://x8nbg8tb0m.execute-api.eu-west-1.amazonaws.com/dev/trig2xml', true);
-	f.onreadystatechange = function () {
-		if(f.readyState === 4) {
-            if(f.status === 200 || f.status == 0) {
-               var res = f.responseXML;
-                console.log(res);
-				self.fixRDFXML(res, callback);
+	
+
+	
+            
+            try {
+                const quads = await parseTrigToQuads(trigString);
+		console.log('✅ Parsed', quads.length, 'quads');
+                const rdfXml = await trigToRdfXmlSimple(quads);
+		self.fixRDFXML(rdfXml, callback);
+            } catch (error) {
+                console.log(error.message);
             }
-		 }
-	};
-	f.send(trig);
+
+        async function parseTrigToQuads(trigString) {
+            return new Promise((resolve, reject) => {
+                const store = new N3.Store();
+                const parser = new N3.Parser();
+                
+                parser.parse(trigString, (error, quad, prefixes) => {
+                    if (error) {
+                        reject(error);
+                    } else if (quad) {
+                        store.addQuad(quad);
+                    } else {
+                        resolve(store.getQuads(null, null, null));
+                    }
+                });
+            });
+        }
+
+	        function trigToRdfXmlSimple(quads) {
+            const rdfNs = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+            const subjects = {};
+
+            // Groepeer quads per subject
+            for (const quad of quads) {
+                const subj = quad.subject.value;
+                if (!subjects[subj]) subjects[subj] = {};
+                const pred = quad.predicate.value;
+                if (!subjects[subj][pred]) subjects[subj][pred] = [];
+                subjects[subj][pred].push(quad.object);
+            }
+
+            let rdfXml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+            rdfXml += `<rdf:RDF xmlns:rdf="${rdfNs}">\n`;
+
+            for (const [subject, predicates] of Object.entries(subjects)) {
+                rdfXml += `  <rdf:Description rdf:about="${subject}">\n`;
+
+                for (const [predicate, objects] of Object.entries(predicates)) {
+                    const localName = predicate.split('/').pop().split('#').pop();
+
+                    if (objects.length === 1) {
+                        const obj = objects[0];
+                        if (obj.termType === 'NamedNode') {
+                            rdfXml += `    <${localName} rdf:resource="${obj.value}"/>\n`;
+                        } else {
+                            rdfXml += `    <${localName}>${escapeXml(obj.value)}</${localName}>\n`;
+                        }
+                    } else {
+                        rdfXml += `    <${localName}>\n`;
+                        for (const obj of objects) {
+                            rdfXml += `      <rdf:Description rdf:about="${obj.value || obj.id}"></rdf:Description>\n`;
+                        }
+                        rdfXml += `    </${localName}>\n`;
+                    }
+                }
+
+                rdfXml += `  </rdf:Description>\n`;
+            }
+
+            rdfXml += `</rdf:RDF>`;
+            return rdfXml;
+        }
+
+        // XML escape helper
+        function escapeXml(str) {
+            return str.replace(/[<>&'"]/g, (c) => {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case "'": return '&apos;';
+                    case '"': return '&quot;';
+                }
+            });
+        }
 }
 
 
 
-Model.prototype.fixRDFXML = function(xml, callback){
-	var loadXSL = function (filename){
-		var xhttp = new XMLHttpRequest();
-		xhttp.open("GET", filename, false);
-		xhttp.send("");
-		return xhttp.responseXML;
-	}
+
+Model.prototype.fixRDFXML = async function(xml, callback){
 	var xsltProcessor = new XSLTProcessor();
-	xsltProcessor.importStylesheet(loadXSL("assets/xslt/rdf2xml.xslt"));
-	var result = xsltProcessor.transformToFragment(xml, document);
+	const xslResponse = await fetch('assets/xslt/rdf2xml.xslt');
+        const xslText = await xslResponse.text();
+        const xsltFile = new DOMParser().parseFromString(xslText, 'application/xml');
+        const xmlFile = new DOMParser().parseFromString(xml, 'application/xml');
+	console.log(xsltFile)
+	xsltProcessor.importStylesheet(xsltFile);
+	console.log(xmlFile)
+	var result = xsltProcessor.transformToFragment(xmlFile, document);
 	console.log(result);
 	var ser = new XMLSerializer();
 	
