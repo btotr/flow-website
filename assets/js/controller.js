@@ -65,7 +65,7 @@ Controller.prototype.create = function(){
 	var self = this;
 	this.model.loadsparqlFile(document.getElementById("name").value, instructions, function(recipe){
 		
-		/*var loadXSL = function (filename){
+		var loadXSL = function (filename){
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", filename, false);
 			xhttp.send("");
@@ -83,12 +83,13 @@ Controller.prototype.create = function(){
 		var ser = new XMLSerializer();
 		
 		console.log(ser.serializeToString(result));
-		var contentVis = ser.serializeToString(result);*/
+		var contentVis = result;
+		var content = ser.serializeToString(result);
 		
 		
 	    console.log("add flow visualisation");
 	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
 	    self.view.createDownload(content,"data");
-	    //self.view.createDownload(contentVis, "vis");
+	    self.view.createDownload(contentVis, "vis");
 	 });
 };
