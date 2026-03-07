@@ -64,7 +64,7 @@ Controller.prototype.create = function(){
 	console.log(instructions) ;
 	var self = this;
 	this.model.loadsparqlFile(document.getElementById("name").value, instructions, function(recipe){
-		
+		var ipfsGateway = "https://ipfs.io/"	
 		var loadXSL = function (filename){
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", filename, false);
@@ -77,7 +77,7 @@ Controller.prototype.create = function(){
 		console.log(xml)
 		
 		var xsltProcessor = new XSLTProcessor();
-		xsltProcessor.importStylesheet(loadXSL("http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"));
+		xsltProcessor.importStylesheet(loadXSL(ipfsGateway+"ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/flow-visualizer/flow-visualiser.xsl"));
 		var result = xsltProcessor.transformToFragment(xml, document);
 		console.log(result);
 		var ser = new XMLSerializer();
@@ -88,8 +88,8 @@ Controller.prototype.create = function(){
 		
 		
 	    console.log("add flow visualisation");
-	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
-	    self.view.createDownload(content,"data");
+	    //var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="http://hhz37uwqkfcbfuztcp6w7cyjfphezqelp56ajlb2for75rragzirbcid.onion/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
+	    self.view.createDownload(recipe,"data");
 	    self.view.createDownload(contentVis, "vis");
 	 });
 };
