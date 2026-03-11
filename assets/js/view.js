@@ -79,22 +79,12 @@ View.prototype.createDownload = function(visualRecipe, type){
 		link.innerText = 'enjoy your recipe!';
 		output.replaceChild(link, output.firstElementChild);
 	} else {
-    	//	const blob = new Blob([visualRecipe], { type: 'image/svg+xml' });
-    	//	const blobUrl = URL.createObjectURL(blob);
-
     		const img = document.createElement('img');
-   	//	 img.src = blobUrl;
-    		img.style.width = '400px';
+    		img.style.width = '800px';
     		img.style.height = '200px';
-    		img.style.borderRadius = '50%';  // Optional blob styling
 		console.log(visualRecipe.firstElementChild.namespaceURI)
-    		document.getElementsByTagName('output')[1].appendChild(visualRecipe);
-	
-
-
-
-		new xController();
-
+    		var output = document.getElementsByTagName('output')[1]
+		output.replaceChild(visualRecipe, output.firstElementChild);
 	}
 
 	
