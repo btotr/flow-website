@@ -7,10 +7,26 @@ Model.prototype.querySparql = function(sp, callback){
 	console.log("query sparql");
 	var engine = Comunica.newEngine();
 	var self = this;
-	var ipfsGateway = "https://ipfs.io/"
-	engine.query(sp ,   { sources: [ 
-			{ type: 'file', value: ipfsGateway + 'ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/core' },
-			{ type: 'file', value: ipfsGateway + 'ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/schema' }
+	
+	/* use a custom ipfs gateway with proxy to serve ser correct content-type for communica
+	 *
+	 *example nginx
+	 *
+	 *location /ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/core/ns/ {
+	 *	alias /var/www/html/ns/;
+	 *	more_clear_headers Content-Type;
+	 *	add_header Content-Type "application/n-triples; charset=utf-8" always;
+         *	try_files $uri =404;
+   	 *}
+	 *
+	 * */
+
+
+	var ipfsGateway = window.location.origin 
+	//var ipfsGateway = "https://ipfs.io/"
+	engine.query(sp , { sources: [ 
+			{ type: 'file', value: ipfsGateway + '/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/core' },
+			{ type: 'file', value: ipfsGateway + '/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/schema' }
 		] }).then(function (result){
 			engine.resultToString(result, 'application/trig', result.context).then((d) => {
 			var res = '';
@@ -27,14 +43,12 @@ Model.prototype.querySparql = function(sp, callback){
 Model.prototype.trig2RDFXML = async function(trigString, callback){
 	console.log("trig2RDFXML");
 	var self = this;
-	
-
-	
-            
+          
             try {
                 const quads = await parseTrigToQuads(trigString);
-		console.log('✅ Parsed', quads.length, 'quads');
+		// console.log('✅ Parsed', quads.length, 'quads', quads);
                 const rdfXml = await trigToRdfXmlSimple(quads);
+		console.log(rdfXml)    
 		self.fixRDFXML(rdfXml, callback);
             } catch (error) {
                 console.log(error.message);
@@ -44,7 +58,6 @@ Model.prototype.trig2RDFXML = async function(trigString, callback){
             return new Promise((resolve, reject) => {
                 const store = new N3.Store();
                 const parser = new N3.Parser();
-                
                 parser.parse(trigString, (error, quad, prefixes) => {
                     if (error) {
                         reject(error);
@@ -57,50 +70,59 @@ Model.prototype.trig2RDFXML = async function(trigString, callback){
             });
         }
 
-	        function trigToRdfXmlSimple(quads) {
-            const rdfNs = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
-            const subjects = {};
 
-            // Groepeer quads per subject
-            for (const quad of quads) {
-                const subj = quad.subject.value;
-                if (!subjects[subj]) subjects[subj] = {};
-                const pred = quad.predicate.value;
-                if (!subjects[subj][pred]) subjects[subj][pred] = [];
-                subjects[subj][pred].push(quad.object);
-            }
+function trigToRdfXmlSimple(quads) {
+    const rdfNs = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    const rdfsNs = 'http://www.w3.org/2000/01/rdf-schema#';
+    const xsdNs = 'http://www.w3.org/2001/XMLSchema#';
+    const coreNs = 'ipns://k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/core#';
+    const skosNs = 'http://www.w3.org/2008/05/skos#'; 
+    const subjects = {};
 
-            let rdfXml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-            rdfXml += `<rdf:RDF xmlns:rdf="${rdfNs}">\n`;
 
-            for (const [subject, predicates] of Object.entries(subjects)) {
-                rdfXml += `  <rdf:Description rdf:about="${subject}">\n`;
+    for (const quad of quads) {
+        const subj = quad.subject.value;
+        if (!subjects[subj]) subjects[subj] = {};
+        const pred = quad.predicate.value;
+        if (!subjects[subj][pred]) subjects[subj][pred] = [];
+        subjects[subj][pred].push(quad.object);
+    }
 
-                for (const [predicate, objects] of Object.entries(predicates)) {
-                    const localName = predicate.split('/').pop().split('#').pop();
+    let rdfXml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    rdfXml += `<rdf:RDF xmlns:rdf="${rdfNs}" xmlns:rdfs="${rdfsNs}" xmlns:xsd="${xsdNs}" xmlns:core="${coreNs}" xmlns:skos="${skosNs}">\n`;
 
-                    if (objects.length === 1) {
-                        const obj = objects[0];
-                        if (obj.termType === 'NamedNode') {
-                            rdfXml += `    <${localName} rdf:resource="${obj.value}"/>\n`;
-                        } else {
-                            rdfXml += `    <${localName}>${escapeXml(obj.value)}</${localName}>\n`;
-                        }
-                    } else {
-                        rdfXml += `    <${localName}>\n`;
-                        for (const obj of objects) {
-                            rdfXml += `      <rdf:Description rdf:about="${obj.value || obj.id}"></rdf:Description>\n`;
-                        }
-                        rdfXml += `    </${localName}>\n`;
-                    }
+    for (const [subject, predicates] of Object.entries(subjects)) {
+        rdfXml += `  <rdf:Description rdf:about="${subject}">\n`;
+
+        for (const [predicate, objects] of Object.entries(predicates)) {
+            const localName = predicate.split('/').pop().split('#').pop();
+
+            const useCorePrefix = predicate.startsWith(coreNs);
+            const useSkosPrefix = predicate.startsWith(skosNs);
+            const useRDFsPrefix = predicate.startsWith(rdfsNs);
+
+            if (objects.length === 1) {
+                const obj = objects[0];
+                if (obj.termType === 'NamedNode') {
+                    rdfXml += `    <${useCorePrefix ? 'core:' : useSkosPrefix ? 'skos:' : useRDFsPrefix ? 'rdfs:' : ''}${localName} rdf:resource="${obj.value}"/>\n`;
+                } else {
+                    rdfXml += `    <${useCorePrefix ? 'core:' : useSkosPrefix ? 'skos:' : useRDFsPrefix ? 'rdfs:' :''}${localName}>${escapeXml(obj.value)}</${useCorePrefix ? 'core:' : useSkosPrefix ? 'skos:' : useRDFsPrefix ? 'rdfs:' : ''}${localName}>\n`;
                 }
-
-                rdfXml += `  </rdf:Description>\n`;
+            } else {
+                rdfXml += `    <${useCorePrefix ? 'core:' : useSkosPrefix ? 'skos:' : useRDFsPrefix ? 'rdfs:' : ''}${localName}>\n`;
+                for (const obj of objects) {
+                    rdfXml += `      <rdf:Description rdf:about="${obj.value || obj.id}"></rdf:Description>\n`;
+                }
+                rdfXml += `    </${useCorePrefix ? 'core:' : useSkosPrefix ? 'skos:' : useRDFsPrefix ? 'rdfs:' : ''}${localName}>\n`;
             }
-
-            rdfXml += `</rdf:RDF>`;
-            return rdfXml;
         }
+
+        rdfXml += `  </rdf:Description>\n`;
+    }
+
+    rdfXml += `</rdf:RDF>`;
+    return rdfXml;
+}
 
         // XML escape helper
         function escapeXml(str) {
@@ -125,14 +147,10 @@ Model.prototype.fixRDFXML = async function(xml, callback){
         const xslText = await xslResponse.text();
         const xsltFile = new DOMParser().parseFromString(xslText, 'application/xml');
         const xmlFile = new DOMParser().parseFromString(xml, 'application/xml');
-	console.log(xsltFile)
 	xsltProcessor.importStylesheet(xsltFile);
-	console.log(xmlFile)
 	var result = xsltProcessor.transformToFragment(xmlFile, document);
-	console.log(result);
 	var ser = new XMLSerializer();
-	
-	console.log(ser.serializeToString(result));
+	console.log(result);
 	callback(ser.serializeToString(result));
 	
 }
