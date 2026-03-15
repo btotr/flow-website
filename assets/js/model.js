@@ -200,6 +200,7 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 					 ${instructions.map(instruction => `("${instruction.method}" ${instruction.weight} ${instruction.ingredient} ${instruction.addition} ${instruction.dependency} ${instruction.time} ${instruction.direction})`).join('\n')}
 				}
 				OPTIONAL {
+					# FIXME should use concept frome schema but is broken
 					?methodConcept skos:prefLabel ?method . 
 				} .
 				BIND(IF(BOUND(?methodConcept), ?methodConcept, IRI(CONCAT("fs:m-",SHA256(?method)))) AS ?methodConceptInstance) .
