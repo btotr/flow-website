@@ -13,8 +13,8 @@ function Controller() {
 	  	if (e.which === 13) self.view.addInstruction();
 	});
 	document.getElementById("create").addEventListener("click", function(e){
-	    self.create();
 	    e.preventDefault();
+	    self.create();
 	    return false;
 	});
 	document.getElementById("create").addEventListener("keydown", function(e){
@@ -50,8 +50,11 @@ Controller.prototype.create = function(){
 			let addition = ingredient.getElementsByClassName("ingredient")[0].value.split(/ \| /)[1] ;
 			if (addition) addition = '"' + addition + '"';
 			
+			
+			let method = instruction.getElementsByClassName("method")[0].value.split(/ \| /)[0] ; 
+
 			instructions.push(
-			 	{	method: instruction.getElementsByClassName("method")[0].value.split(/ \| /)[0] , 
+			 	{	method: method, 
 			 		ingredient: ingredientV || "UNDEF", 
 			 		weight: weight || "UNDEF",
 			 		dependency: dep || "UNDEF",
