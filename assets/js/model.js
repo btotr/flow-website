@@ -202,15 +202,15 @@ Model.prototype.loadsparqlFile = function(recipeName, instructions, callback) {
 				OPTIONAL {
 					?methodConcept skos:prefLabel ?method . 
 				} .
-				BIND(IF(BOUND(?methodConcept), ?methodConcept, IRI(CONCAT("fs:",STR(NOW()), "-", ?method))) AS ?methodConceptInstance) .
+				BIND(IF(BOUND(?methodConcept), ?methodConcept, IRI(CONCAT("fs:m-",SHA256(?method)))) AS ?methodConceptInstance) .
 				OPTIONAL {
 					?ingredientConcept skos:prefLabel ?ingredient . 
 				} .
-				BIND(IF(BOUND(?ingredientConcept), ?ingredientConcept, IRI(CONCAT("fs:",STR(NOW()), "-", ?ingredient))) AS ?ingredientConceptInstance) .
-				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()), "-", ?method)) AS ?instruction) .
-				BIND(IF(!BOUND(?dep), ?dummy, IRI(CONCAT(REPLACE(STR(?recipeName)," ","-"),STR(NOW()), "-", ?dep))) AS ?depVariationInstruction) .
-				BIND( IRI(CONCAT(REPLACE(STR(?recipeName)," ","-") ,STR(NOW()))) AS ?recipeInstance) .
-				BIND( IRI(CONCAT(STR(?instruction),STR(NOW()),"-cu")) AS ?cu) .
+				BIND(IF(BOUND(?ingredientConcept), ?ingredientConcept, IRI(CONCAT("fs:i-", SHA256(?ingredient)))) AS ?ingredientConceptInstance) .
+				BIND(IRI(CONCAT("core:i-", SHA256(CONCAT(STR(NOW()), "-", ?method)))) AS ?instruction) .
+				BIND(IF(!BOUND(?dep), ?dummy, IRI(CONCAT("core:i-", SHA256(CONCAT(STR(NOW()), "-", ?dep))))) AS ?depVariationInstruction) .
+				BIND(IRI(CONCAT("core:", REPLACE(STR(?recipeName)," ","-") ,"-r-",SHA256(CONCAT(STR(NOW()),?recipeName)))) AS ?recipeInstance) .
+				
 			}`;
 	console.log(query);
     this.querySparql(query, callback);
