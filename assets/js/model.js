@@ -8,7 +8,7 @@ Model.prototype.querySparql = function(sp, callback){
 	var engine = Comunica.newEngine();
 	var self = this;
 	
-	/* use a custom ipfs gateway with proxy to serve ser correct content-type for communica
+	/* FIXME use a custom ipfs gateway with proxy to serve the correct content-type for communica
 	 *
 	 *example nginx
 	 *
@@ -22,8 +22,8 @@ Model.prototype.querySparql = function(sp, callback){
 	 * */
 
 
-	var ipfsGateway = window.location.origin 
-	//var ipfsGateway = "https://ipfs.io/"
+	//var ipfsGateway = window.location.origin 
+	var ipfsGateway = "https://www.meerveld.cc"
 	engine.query(sp , { sources: [ 
 			{ type: 'file', value: ipfsGateway + '/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/core' },
 			{ type: 'file', value: ipfsGateway + '/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/ns/schema' }
