@@ -66,29 +66,43 @@ Controller.prototype.create = function(){
 	}
 	console.log(instructions) ;
 	var self = this;
-	this.model.loadsparqlFile(document.getElementById("name").value, instructions, function(recipe){
+	this.model.loadsparqlFile(document.getElementById("name").value, instructions,function(recipe){
 		var ipfsGateway = window.location.origin	
-		var loadXSL = function (filename){
+		let parser = new DOMParser()
+		var loadXSL =  function (filename){
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", filename, false);
 			xhttp.send("");
 			return xhttp.responseXML;
 		}
-		
-		let parser = new DOMParser()
+		let xslFile = loadXSL(ipfsGateway+"/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/flow-visualizer/flow-visualiser.xsl")
 		let xml = parser.parseFromString(recipe, "application/xml")
 		var xsltProcessor = new XSLTProcessor();
-		xsltProcessor.importStylesheet(loadXSL(ipfsGateway+"/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/flow-visualizer/flow-visualiser.xsl"));
-		var result = xsltProcessor.transformToFragment(xml, document);
-		var ser = new XMLSerializer();
-		
+		console.log(xslFile)
+		console.log(xml)
+		xsltProcessor.importStylesheet(xslFile);
+		try {
+			var result = xsltProcessor.transformToFragment(xml, document);
+		} catch (error) {
+    			console.error(error.message);
+		}
+
+
+		console.log(result)
+		var ser = new XMLSerializer();	
 		var contentVis = result;
-		var content = ser.serializeToString(result);
-		
+		var content = result
+		try {
+			content = ser.serializeToString(result);
+		} catch {
+			console.log("serialize error")
+		}
 		
 	    console.log("add flow visualisation");
 	    var content = recipe.replace('<rdf:RDF', '<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="'+ipfsGateway+'/ipns/k51qzi5uqu5djcb94wpxqfvhjnajw30k0pm2c0x9tqrgrgud0fdvqlcokpwt9n/flow-visualizer/flow-visualiser.xsl"?><rdf:RDF');
-	    self.view.createDownload(content,"data");
+	    
+	console.log(content)
+		self.view.createDownload(content,"data");
 	    self.view.createDownload(contentVis, "vis");
 	 });
 };
